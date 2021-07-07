@@ -1,7 +1,7 @@
 import axios from 'axios'
-
+import { APP_URL } from './constants'
 const baseURL = axios.create({
-  baseURL: 'http://message-list.appspot.com',
+  baseURL: APP_URL,
   responseType: 'json',
   headers: {
     'Accept': 'application/json',

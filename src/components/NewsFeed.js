@@ -2,7 +2,7 @@ import React , { Component } from 'react';
 import styled from "styled-components";
 import { connect } from "react-redux";
 import { showDeleteOption, deleteMessage } from "../redux/actions/messages"
-
+import { APP_URL } from '../constants'
 class NewsFeed extends Component {
     constructor(props) {
         super(props);
@@ -12,20 +12,6 @@ class NewsFeed extends Component {
         };
       }
     
-    componentDidMount = () => {
-        const {
-            id
-        } = this.props
-        document.getElementById(`content-view${id}`).addEventListener("click", this.handleClick);
-    }
-    
-    componentWillUnmount() {
-        const {
-            id
-        } = this.props
-        document.getElementById(`content-view${id}`).removeEventListener("click", this.handleClick);
-    }
-
     componentWillReceiveProps(nextProps){
         const{
             messageId,
@@ -35,29 +21,28 @@ class NewsFeed extends Component {
             this.setState({showDelete: true}, () => this.handleClick())
         }
     }
-
     handleClick = () => {
         const {
             id,
-            messageId
         } = this.props
         let element = document.getElementById(`content-view${id}`);
         if(this.state.showDelete){
-            console.log(id, 'if')
             element.classList.remove("slides");
             element.classList.add("slides-reverse");
         }
         else{
-            console.log(id, 'else')
             element.classList.remove("slides-reverse")
             element.classList.add("slides");
         }
     }
 
-    showDeleteOption = (id) => {
+    showDeleteOption = (id, e) => {
+        e.preventDefault() 
+        this.handleClick()
         this.props.showDeleteOption(id)
         this.setState({showDelete: !this.state.showDelete})
     }
+
     render() {
         const {
             id,
@@ -67,8 +52,15 @@ class NewsFeed extends Component {
         } = this.props
         return (
             <ContentOverview>
-                {(this.state.showDelete && (messageId === id)) && <div onClick={() => this.props.deleteMessage(id)}>delete option</div>}
-                <FeedContent onClick={() => this.showDeleteOption(id)} id={`content-view${id}`}>
+                {(this.state.showDelete && (messageId === id)) && <div onClick={() => this.props.deleteMessage(id)}>delete</div>}
+                <FeedContent 
+                    onClick={(e) => this.showDeleteOption(id, e)} 
+                    onTouchEnd={(e) => this.showDeleteOption(id, e)}
+                    id={`content-view${id}`}>
+                        <Image 
+                        src={`${APP_URL}${message.author.photoUrl}`}
+                        alt="img"
+                        />
                     {message.content}
                 </FeedContent>
             </ContentOverview>
@@ -90,15 +82,22 @@ export default connect(mapStateToProps, mapDispatchToProps)(NewsFeed)
 
 const ContentOverview = styled.div`
     width: auto; 
-    height: 120px; 
     border: 1px solid;
     display: flex;
     margin: 24px;
     overflow: hidden;
+    padding: 12px;
 `
 
 const FeedContent = styled.div`
     width: 100%;
-    height:100%; 
-    border: 1px solid black;
+    height:100%;
+    cursor: pointer; 
+`
+
+const Image = styled.img`
+    width: 60px;
+    height: 60px;
+    border-radius: 50px;
+    cursor: pointer; 
 `

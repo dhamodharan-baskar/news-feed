@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import NewsFeed from "../components/NewsFeed.js"
+import Header from "../components/Header.js"
 import { connect } from "react-redux";
 import { getMessages } from "../redux/actions/messages"
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -25,7 +26,8 @@ class Home extends Component {
             messages
         } = this.props
         return (
-            <div id="feed-list-overview" style={{border:'1px solid'}}>
+            <div id="feed-list-overview" draggable={false}>
+                <Header />
                 <InfiniteScroll
                     dataLength={messages.length}
                     next={this.fetchMoreData}
