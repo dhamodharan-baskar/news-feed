@@ -1,4 +1,3 @@
-import './App.css';
 import Home from './containers/Home.js'
 import store from './redux/store';
 import {Provider} from 'react-redux';
