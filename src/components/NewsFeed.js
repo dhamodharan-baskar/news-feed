@@ -19,9 +19,6 @@ class NewsFeed extends Component {
             messageId,
             id
         } = nextProps
-        const{
-            showDelete
-        } = this.state
         if(messageId !== id && this.state.showDelete){
             this.setState({showDelete: false}, () => this.removeDomStyles())
         }

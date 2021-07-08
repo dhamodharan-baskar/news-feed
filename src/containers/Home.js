@@ -12,7 +12,8 @@ class Home extends Component {
         super(props)
         this.state = {
             isModalOpen: false,
-            selectMessageId: null
+            selectMessageId: null,
+            showLoadButton: false
         }
       }
 
@@ -21,7 +22,12 @@ class Home extends Component {
     }
 
     fetchMoreData = () => {
-        this.props.getMessages(this.props.pageToken)
+        const{
+            pageToken
+        } = this.props
+        if(pageToken){
+            this.props.getMessages(pageToken)
+        }
     }
 
     deleteMessage = (id) => {
@@ -38,19 +44,33 @@ class Home extends Component {
         element.classList.remove("slides-reverse");
         this.props.deleteMessage(this.state.selectMessageId)
         this.setState({isModalOpen: false, selectMessageId: null})
+        this.checkScrollHeight()
+    }
+
+    checkScrollHeight = () => {
+        const element = document.getElementById(`container`);
+        const newsfeed = document.getElementById(`newsfeed`);
+        if(element.offsetHeight > newsfeed.scrollHeight){
+            this.setState({showLoadButton: true})
+        }
+        else{
+            this.setState({showLoadButton: false})
+        }
     }
 
     
 
     render() { 
         const {
-            messages
+            messages,
+            pageToken
         } = this.props
         const {
-            isModalOpen
+            isModalOpen,
+            showLoadButton
         } = this.state
         return (
-            <Overiew>
+            <Overiew id="container">
                 <Header />
                 {
                     isModalOpen && <ConfirmationModal 
@@ -61,8 +81,9 @@ class Home extends Component {
                 <InfiniteScroll 
                     dataLength={messages.length} 
                     next={this.fetchMoreData} 
+                    style={{backgroundColor: 'rgb(235, 239, 243)'}}
                     hasMore={true}>
-                    <MessageFeed>
+                    <MessageFeed id="newsfeed">
                         {messages.map((message) => {
                             return(<NewsFeed 
                                     deleteMessage = {this.deleteMessage}
@@ -71,7 +92,21 @@ class Home extends Component {
                         }
                     </MessageFeed>
                 </InfiniteScroll>
-                <div onClick={() => this.fetchMoreData()}> load more options</div>
+                <>
+                 {pageToken && 
+                 <>
+                 {
+                    showLoadButton ? 
+                    <LoadButtonView>
+                        <LoadButton type="submit" onClick={() => this.fetchMoreData()}>Load more messages</LoadButton>
+                    </LoadButtonView>
+                    :
+                    <Loading >Fetching data...</Loading>
+                }
+                 </>
+                }
+                </>
+                
             </Overiew>  
         )
     }
@@ -94,7 +129,40 @@ export default connect(mapStateToProps, mapDispatchToProps)(Home)
 const MessageFeed = styled.div`
     margin-top: 74px;
 `
+const Loading = styled.div`
+    font-size: 14px;
+    color: #12344D;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    background-color: rgb(235, 239, 243);
+    padding-bottom: 24px;
+`
+
 const Overiew = styled.div`
     background-color: rgb(235, 239, 243);
+    height: 100vh;
+`
+const LoadButtonView = styled.div`
+  display: flex;
+  justify-content: center;
+`
+
+const LoadButton = styled.button`
+    margin: 12px;
+    cursor: pointer;
+    border: 1px solid #CFD7DF;
+    border-radius: 4px;
+    box-shadow: 0 0 white;
+    width: auto;
+    font-weight: 600;
+    padding: 0 10px;
+    position: relative;
+    text-align: center;
+    color: #12344D;
+    font-size: 14px;
+    opacity: 1;
+    height: 32px;
+    background: linear-gradient(180deg,#FFFFFF 0%,#F3F5F7 100%);
 `
 
