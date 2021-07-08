@@ -3,11 +3,11 @@ import styled from "styled-components";
 
 const HeaderIcon = props => {
   return (
-    <div>
+    <OverView>
       <Line />
       <Line />
       <Line />
-    </div>
+    </OverView>
   );
 };
 
@@ -19,4 +19,7 @@ const Line = styled.div`
     border-radius: 4px;
     background-color: rgb(235, 239, 243);
     margin: 4px;
+`
+const OverView =  styled.div`
+  cursor: pointer
 `
