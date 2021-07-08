@@ -1,7 +1,8 @@
 import {
   GET_MESSAGE_LIST,
   SHOW_DELETE_OPTION,
-  DELETE_MESSAGE
+  DELETE_MESSAGE,
+  SHOW_LOADER
 } from "../actionTypes";
 import baseUrl from '../../baseUrl'
 
@@ -33,5 +34,12 @@ export function showDeleteOption(id) {
   return {
       type: SHOW_DELETE_OPTION,
       id
+  };
+}
+
+export function showLoading(boolean) {
+  return {
+      type: SHOW_LOADER,
+      boolean
   };
 }

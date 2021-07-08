@@ -3,10 +3,10 @@ import NewsFeed from "../components/NewsFeed.js"
 import Header from "../components/Header.js"
 import ConfirmationModal from "../components/ConfirmationModal.js"
 import { connect } from "react-redux";
-import { getMessages, deleteMessage } from "../redux/actions/messages"
+import { getMessages, deleteMessage, showLoading } from "../redux/actions/messages"
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from "styled-components";
-
+import Loader from "react-loader-spinner";
 class Home extends Component {
     constructor(props){
         super(props)
@@ -18,6 +18,7 @@ class Home extends Component {
       }
 
     componentDidMount(){
+        this.props.showLoading(true)
         this.props.getMessages()
     }
 
@@ -63,64 +64,88 @@ class Home extends Component {
     render() { 
         const {
             messages,
-            pageToken
+            pageToken,
+            showLoader
         } = this.props
         const {
             isModalOpen,
             showLoadButton
         } = this.state
-        return (
-            <Overiew id="container">
-                <Header />
-                {
-                    isModalOpen && <ConfirmationModal 
-                    isOpen={isModalOpen}
-                    onSubmit={this.confirmDelete}
-                    onRequestClose={this.closeModal}/>
-                }
-                <InfiniteScroll 
-                    dataLength={messages.length} 
-                    next={this.fetchMoreData} 
-                    style={{backgroundColor: 'rgb(235, 239, 243)'}}
-                    hasMore={true}>
-                    <MessageFeed id="newsfeed">
-                        {messages.map((message) => {
-                            return(<NewsFeed 
-                                    deleteMessage = {this.deleteMessage}
-                                    id={message.id} 
-                                    message={message} />)})
-                        }
-                    </MessageFeed>
-                </InfiniteScroll>
-                <>
-                 {pageToken && 
-                 <>
-                 {
-                    showLoadButton ? 
-                    <LoadButtonView>
-                        <LoadButton type="submit" onClick={() => this.fetchMoreData()}>Load more messages</LoadButton>
-                    </LoadButtonView>
-                    :
-                    <Loading >Fetching data...</Loading>
-                }
-                 </>
-                }
-                </>
-                
-            </Overiew>  
-        )
+        if(showLoader){
+            return (
+            <LoaderOveriew> 
+                <Loader
+                    type="Circles"
+                    color="#00BFFF"
+                    height={100}
+                    width={100}
+                    timeout={3000} />
+            </LoaderOveriew>
+            )
+        }   
+        else{
+            return (
+                <Overiew id="container">
+                    <Header />
+                    {
+                        isModalOpen && <ConfirmationModal 
+                        isOpen={isModalOpen}
+                        onSubmit={this.confirmDelete}
+                        onRequestClose={this.closeModal}/>
+                    }
+                    <InfiniteScroll 
+                        dataLength={messages.length} 
+                        next={this.fetchMoreData} 
+                        style={{backgroundColor: 'rgb(235, 239, 243)'}}
+                        hasMore={true}>
+                        <MessageFeed id="newsfeed">
+                            {messages.map((message) => {
+                                return(<NewsFeed 
+                                        deleteMessage = {this.deleteMessage}
+                                        id={message.id} 
+                                        message={message} />)})
+                            }
+                        </MessageFeed>
+                    </InfiniteScroll>
+                    <>
+                     {pageToken && 
+                     <>
+                     {
+                        showLoadButton ? 
+                        <LoadButtonView>
+                            <LoadButton type="submit" onClick={() => this.fetchMoreData()}>Load more messages</LoadButton>
+                        </LoadButtonView>
+                        :
+                        <Loading >
+                            <Loader
+                            type="TailSpin"
+                            color="#00BFFF"
+                            height={40}
+                            width={40}
+                            timeout={3000} />
+                        </Loading>
+                    }
+                     </>
+                    }
+                    </>
+                </Overiew>  
+            )
+        }
+        
     }
 }
 
  const mapDispatchToProps = dispatch => ({
     getMessages: token => dispatch(getMessages(token)),
-    deleteMessage: id => dispatch(deleteMessage(id))
+    deleteMessage: id => dispatch(deleteMessage(id)),
+    showLoading: bool => dispatch(showLoading(bool)),
   });
   
   const mapStateToProps = state => ({
     messageId: state.messages.messageId,
     messages: state.messages.messages,
-    pageToken: state.messages.pageToken
+    pageToken: state.messages.pageToken,
+    showLoader: state.messages.loading
   });
 
   
@@ -129,6 +154,14 @@ export default connect(mapStateToProps, mapDispatchToProps)(Home)
 const MessageFeed = styled.div`
     margin-top: 74px;
 `
+const LoaderOveriew = styled.div`
+    background-color: rgb(235, 239, 243);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center
+`
+
 const Loading = styled.div`
     font-size: 14px;
     color: #12344D;
