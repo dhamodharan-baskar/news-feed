@@ -29,7 +29,6 @@ var initialState = {
         };
 
       case DELETE_MESSAGE:
-        console.log('delete', action)
           return {
             ...state,
             messages: state.messages.filter(item => item.id !== action.id)
