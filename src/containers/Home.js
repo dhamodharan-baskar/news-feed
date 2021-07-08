@@ -11,7 +11,8 @@ class Home extends Component {
     constructor(props){
         super(props)
         this.state = {
-            isModalOpen: false
+            isModalOpen: false,
+            selectMessageId: null
         }
       }
 
@@ -24,16 +25,22 @@ class Home extends Component {
     }
 
     deleteMessage = (id) => {
-        this.setState({isModalOpen: true})
+        this.setState({isModalOpen: true, selectMessageId: id})
     }
 
     closeModal = () => {
-        this.setState({isModalOpen: false})
+        this.setState({isModalOpen: false, selectMessageId: null})
     }
 
     confirmDelete = () => {
-        this.setState({isModalOpen: false})
+        const element = document.getElementById(`content-view${this.state.selectMessageId}`);
+        element.classList.remove("slides");
+        element.classList.remove("slides-reverse");
+        this.props.deleteMessage(this.state.selectMessageId)
+        this.setState({isModalOpen: false, selectMessageId: null})
     }
+
+    
 
     render() { 
         const {

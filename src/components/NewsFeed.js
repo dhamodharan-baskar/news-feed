@@ -19,9 +19,21 @@ class NewsFeed extends Component {
             messageId,
             id
         } = nextProps
+        const{
+            showDelete
+        } = this.state
         if(messageId !== id && this.state.showDelete){
-            this.setState({showDelete: true}, () => this.handleClick())
+            this.setState({showDelete: false}, () => this.removeDomStyles())
         }
+    }
+
+    removeDomStyles = () => {
+        const {
+            id,
+        } = this.props
+        const element = document.getElementById(`content-view${id}`);
+        element.classList.remove("slides");
+        element.classList.remove("slides-reverse");
     }
 
     handleClick = () => {
@@ -29,7 +41,7 @@ class NewsFeed extends Component {
             id,
         } = this.props
         const element = document.getElementById(`content-view${id}`);
-        if(this.state.showDelete){
+        if(!this.state.showDelete){
             element.classList.remove("slides");
             element.classList.add("slides-reverse");
         }
@@ -41,13 +53,16 @@ class NewsFeed extends Component {
 
     showDeleteOption = (id, e) => {
         e.preventDefault() 
-        this.handleClick()
         this.props.showDeleteOption(id)
-        this.setState({showDelete: !this.state.showDelete})
+        this.setState({showDelete: !this.state.showDelete}, () => this.handleClick())
     }
 
     getYear = (date) => {
         return <div>{`${new Date().getFullYear() - new Date(date).getFullYear()} years ago`}</div>
+    }
+
+    deleteMessage = (id) => {
+        this.setState({showDelete: false}, () => this.props.deleteMessage(id))
     }
 
     render() {
@@ -60,7 +75,7 @@ class NewsFeed extends Component {
             <ContentOverview>
                 {
                     (this.state.showDelete && (messageId === id)) && 
-                    <DeleteOption onClick={() => this.props.deleteMessage(id)}>
+                    <DeleteOption onClick={() => this.deleteMessage(id)}>
                         <DeleteIcon />
                     </DeleteOption>
                 }
